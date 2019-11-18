@@ -2,7 +2,7 @@
 import React from 'react'
 import axios from 'axios'
 import {Link} from 'react-router-dom'
-import * as d3 from "d3"
+import * as d3 from 'd3'
 
 
 class Home extends React.Component{
@@ -18,7 +18,7 @@ class Home extends React.Component{
 
 
   componentDidMount(){
-    axios.get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD')
+    axios.get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=20&tsym=USD')
       .then(res => this.setState({ coins: res.data }))
 
 
@@ -27,35 +27,40 @@ class Home extends React.Component{
   }
 
   drawBarChart(data)  {
+    console.log(data)
   const  canvas = document.getElementById('canvas')
 const canvasHeight = 400
-const canvasWidth = 600
+const canvasWidth = 1200
 const scale = 1
     const svgCanvas = d3.select(canvas)
-    .append('svg')
-    .attr('width', 600)
-    .attr('height', 400)
-    .style('border', '1px solid black')
+      .append('svg')
+      .attr('width', 1200)
+      .attr('height', 400)
+      .style('border', '1px solid black')
     svgCanvas.selectAll('rect')
-    .data(data).enter()
-        .append('rect')
-        .attr('width', 40)
-        .attr('height', (datapoint) => datapoint * scale)
-        .attr('fill', 'orange')
-        .attr('x', (datapoint, iteration) => iteration * 45)
-        .attr('y', (datapoint) => canvasHeight - datapoint * scale)
+      .data(data.map(x=> x= x.RAW.USD.PRICE)).enter()
+      .append('rect')
+      .attr('width', 40)
+      .attr('height', (datapoint) => datapoint * scale)
+      .attr('fill', 'orange')
+      .attr('x', (datapoint, iteration) => iteration * 45)
+      .attr('y', (datapoint) => canvasHeight - datapoint * scale)
 
-        svgCanvas.selectAll('text')
-      .data(data).enter()
-          .append('text')
-          .attr('x', (dataPoint, i) => i * 45 + 10)
-          .attr('y', (dataPoint, i) => canvasHeight - dataPoint * scale - 10)
-          .text(dataPoint => dataPoint.toFixed(3))
+    svgCanvas.selectAll('text')
+      .data(data.map(x=> x= x.RAW.USD.PRICE)).enter()
+      .append('text')
+      .attr('x', (dataPoint, i) => i * 45 + 10)
+      .attr('y', (dataPoint, i) => canvasHeight - dataPoint * scale - 10)
+      .text(dataPoint => dataPoint.toFixed(3))
+
+
+
   }
 
 
   componentDidUpdate() {
-  this.drawBarChart(this.state.coins.Data.map(x=> x = x.RAW.USD.PRICE))
+  // this.drawBarChart(this.state.coins.Data.map(x=> x = x.RAW.USD.PRICE))
+  this.drawBarChart(this.state.coins.Data)
 }
 
   render() {
