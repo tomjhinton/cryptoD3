@@ -1,0 +1,41 @@
+
+.title{
+  margin-top: 3em;
+}
+
+.coin{
+  font-family: 'Helvetica';
+  -webkit-animation: coin 4s ease-out;
+  -webkit-animation-iteration-count: infinite;
+  transition: 5s;
+
+
+}
+
+svg{
+  margin-left:1em;
+}
+
+.column{
+  border: 1px solid black;
+}
+
+
+
+
+@-webkit-keyframes coin {
+    0% {
+        color: red;
+
+    }
+
+
+    50% {
+        color: blue;
+
+    }
+    100% {
+
+      color: red;
+    }
+}

@@ -57,14 +57,7 @@ class Home extends React.Component{
     //   .attr("transform",
     //       "translate(" + margin.left + "," + margin.top + ")")
     //
-    // svgCanvas.selectAll('text')
-    //   .data(data).enter()
-    //   .append('text')
-    //
-    //   .attr('x', (dataPoint, i) => i * 65 + 10)
-    //   .attr('y', (dataPoint, i) => height - dataPoint.RAW.USD.PRICE  * scale - 10)
-    //   .text(dataPoint => dataPoint.CoinInfo.Name + ' :$' + dataPoint.RAW.USD.PRICE)
-    //   .attr('fill', 'red')
+
     //
     //
     //     svgCanvas.append("g")
@@ -73,13 +66,15 @@ class Home extends React.Component{
        var width = 1400, height = 600;
 
        var dataNum = data.map(x=> x= x.RAW.USD.PRICE)
+       console.log(data)
        var svg = d3.select("body")
            .append("svg")
            .attr("width", width)
-           .attr("height", height);
+           .attr("height", height)
+           .style('border', '3px solid black')
 
        var xscale = d3.scaleLinear()
-           .domain([0, d3.max(dataNum)])
+           .domain([0, width])
            .range([0, width - 100]);
 
        var yscale = d3.scaleLinear()
@@ -98,89 +93,61 @@ class Home extends React.Component{
 
        var xAxisTranslate = height/2 + 10;
 
-    svg.append("g")
-      .attr("transform", "translate(50, " + xAxisTranslate  +")")
-      .call(x_axis)
+    //
+     // svg.append("g")
+     // .attr("transform", "translate(50, " + xAxisTranslate  +")")
+     //  .call(x_axis)
 
-      console.log(yscale)
+    console.log(yscale)
+
     svg.selectAll('bar')
       .data(data).enter()
       .append('rect')
-      .attr('width', 40)
+      .attr('width', 20)
       .attr('height', (datapoint) => datapoint.RAW.USD.PRICE)
       .attr('fill', 'blue')
       .attr('x', (datapoint, iteration) => (iteration * 65) +60)
       .attr('y', (dataPoint, i) => height/2 + 10 - dataPoint.RAW.USD.PRICE )
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(2000)
+      .attr('fill','pink')
+
+    svg.selectAll('bar')
+      .data(data).enter()
+      .append('text')
+      .attr('x', (datapoint, iteration) => (iteration * 65) +60)
+      .attr('y', (dataPoint) => height/2 + 35 )
+      .text(dataPoint => dataPoint.CoinInfo.Name)
+      .attr('fill', 'red')
+      .attr('font-family','Helvetica')
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(3000)
+      .attr('fill','blue')
+      //.attr('font-family','Courier New')
 
       // .append("g")
       // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+setInterval(function () {
+  svg.selectAll('rect')
+  .transition()
+  .ease(d3.easeLinear)
+  .duration(5000)
+  .style('fill','green')
+  .transition()
+  .ease(d3.easeBounce)
+  .duration(5000)
+  .style('fill','pink')
+
+}, 12000)
+
 
   }
 
 
-  chart2(data){
-    const  canvas = document.getElementById('canvas')
-    var svg = d3.select(canvas),
-        margin = 200,
-        width = svg.attr("width") - margin,
-        height = svg.attr("height") - margin
 
-    svg.append("text")
-       .attr("transform", "translate(100,0)")
-       .attr("x", 50)
-       .attr("y", 50)
-       .attr("font-size", "24px")
-       .text("XYZ Foods Stock Price")
-
-    var xScale = d3.scaleBand().range([0, width]).padding(0.4),
-        yScale = d3.scaleLinear().range([height, 0]);
-
-    var g = svg.append("g")
-               .attr("transform", "translate(" + 100 + "," + 100 + ")");
-
-    d3.csv("XYZ.csv", function(error, data) {
-        if (error) {
-            throw error;
-        }
-
-        xScale.domain(data.map(function(d) { return d.year; }));
-        yScale.domain([0, d3.max(data, function(d) { return d.value; })]);
-
-        g.append("g")
-         .attr("transform", "translate(0," + height + ")")
-         .call(d3.axisBottom(xScale))
-         .append("text")
-         .attr("y", height - 250)
-         .attr("x", width - 100)
-         .attr("text-anchor", "end")
-         .attr("stroke", "black")
-         .text("Year");
-
-        g.append("g")
-         .call(d3.axisLeft(yScale).tickFormat(function(d){
-             return "$" + d;
-         })
-         .ticks(10))
-         .append("text")
-         .attr("transform", "rotate(-90)")
-         .attr("y", 6)
-         .attr("dy", "-5.1em")
-         .attr("text-anchor", "end")
-         .attr("stroke", "black")
-         .text("Stock Price");
-
-        g.selectAll(".bar")
-         .data(data)
-         .enter().append("rect")
-         .attr("class", "bar")
-         .attr("x", function(d) { return xScale(d.year); })
-         .attr("y", function(d) { return yScale(d.value); })
-         .attr("width", xScale.bandwidth())
-         .attr("height", function(d) { return height - yScale(d.value); });
-    });
-
-  }
 
 
 
@@ -191,21 +158,38 @@ class Home extends React.Component{
 }
 
   render() {
+    var settings = {
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1
+    }
+
+
 
     console.log(this.state.coins)
 
     return (
       <div className='container'>
+        <div className='title'>
+        COINS ETC
+        </div>
 
-
-        {this.state.coins && <div>
+        {this.state.coins && <div className="columns is-multiline">
 
           {this.state.coins.Data.map(coin =>
-            <div key={coin.CoinInfo.Id}>
-              {coin.CoinInfo.FullName}:$ {coin.RAW.USD.PRICE}
-            </div>
+            <div key={coin.CoinInfo.Id} className='coin column is-one-quarter'>
+              {coin.CoinInfo.FullName}: $ {coin.RAW.USD.PRICE}
+              <div>
+              24hr High: ${coin.RAW.USD.HIGH24HOUR}
+              </div>
+              <div>
+            24hr Low: ${coin.RAW.USD.LOW24HOUR}
+              </div>
 
-          )}
+            </div>)}
+
         </div>}
 
         <div className='chart'>
